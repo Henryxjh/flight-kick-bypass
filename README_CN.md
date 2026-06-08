@@ -38,6 +38,8 @@ Flight Kick Bypass 是一个适用于 Minecraft 1.21.1 的服务端 NeoForge mod
 ```toml
 kickAfterTeleport = true
 expandedSearchRadius = 0
+disconnectMessageSuffix = "Teleported to the nearest safe position before disconnecting."
+teleportMessage = "Flying was detected for too long, so you were teleported to the nearest safe position instead of being disconnected."
 ```
 
 `kickAfterTeleport` 选项说明：
@@ -49,6 +51,11 @@ expandedSearchRadius = 0
 
 - `0` 默认值：只搜索玩家正下方。
 - 大于 `0`：如果正下方搜索失败，则以玩家当前方块位置为中心搜索正方形范围。值为 `r` 时，搜索范围为 `(2r + 1) x (2r + 1)`。
+
+向玩家展示的文本：
+
+- `disconnectMessageSuffix`：当 `kickAfterTeleport` 为 `true` 且传送成功时，追加到飞行踢出原因的新一行文本。设为空字符串可以禁用这行额外提示。
+- `teleportMessage`：当 `kickAfterTeleport` 为 `false` 且传送成功时，作为系统消息发送给玩家。设为空字符串可以禁用这条消息。
 
 ## 安装
 

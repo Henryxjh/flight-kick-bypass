@@ -38,6 +38,8 @@ The mod registers a server config. On a dedicated server, NeoForge writes it und
 ```toml
 kickAfterTeleport = true
 expandedSearchRadius = 0
+disconnectMessageSuffix = "Teleported to the nearest safe position before disconnecting."
+teleportMessage = "Flying was detected for too long, so you were teleported to the nearest safe position instead of being disconnected."
 ```
 
 `kickAfterTeleport` options:
@@ -49,6 +51,11 @@ expandedSearchRadius = 0
 
 - `0` default: only search directly below the player.
 - Greater than `0`: if the direct search fails, search a square area around the player's current block position. A value of `r` searches a `(2r + 1) x (2r + 1)` square.
+
+Player-facing messages:
+
+- `disconnectMessageSuffix`: appended on a new line to the flying disconnect reason after a successful teleport when `kickAfterTeleport` is `true`. Set it to an empty string to disable the extra line.
+- `teleportMessage`: sent as a system message to the player after a successful teleport when `kickAfterTeleport` is `false`. Set it to an empty string to disable the message.
 
 ## Installation
 

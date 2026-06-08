@@ -25,14 +25,6 @@ public abstract class ServerGamePacketListenerImplMixin {
     private static final String flightkickbypass$CONFIG = "io.github.henryxjh.flightKickBypass.Config";
     @Unique
     private static final String flightkickbypass$FLIGHT_KICK_LANDING = "io.github.henryxjh.flightKickBypass.FlightKickLanding";
-    @Unique
-    private static final Component flightkickbypass$TELEPORTED_TO_SAFE_POSITION = Component.literal(
-            "\nTeleported to the nearest safe position before disconnecting."
-    );
-    @Unique
-    private static final Component flightkickbypass$TELEPORT_REASON = Component.literal(
-            "Flying was detected for too long, so you were teleported to the nearest safe position instead of being disconnected."
-    );
 
     @Shadow
     public ServerPlayer player;
@@ -128,12 +120,20 @@ public abstract class ServerGamePacketListenerImplMixin {
         }
 
         this.flightkickbypass$landedBeforeFlyingKick = false;
-        return reason.copy().append(flightkickbypass$TELEPORTED_TO_SAFE_POSITION);
+        String suffix = flightkickbypass$getDisconnectMessageSuffix();
+        if (suffix.isBlank()) {
+            return reason;
+        }
+
+        return reason.copy().append(Component.literal("\n")).append(Component.literal(suffix));
     }
 
     @Unique
     private void flightkickbypass$notifyPlayerAboutLanding() {
-        this.player.sendSystemMessage(flightkickbypass$TELEPORT_REASON);
+        String message = flightkickbypass$getTeleportMessage();
+        if (!message.isBlank()) {
+            this.player.sendSystemMessage(Component.literal(message));
+        }
     }
 
     @Unique
@@ -159,6 +159,24 @@ public abstract class ServerGamePacketListenerImplMixin {
                 "kickAfterTeleport",
                 new Class<?>[0]
         ).filter(Boolean.class::isInstance).map(Boolean.class::cast).orElse(true);
+    }
+
+    @Unique
+    private static String flightkickbypass$getDisconnectMessageSuffix() {
+        return flightkickbypass$invokeStatic(
+                flightkickbypass$CONFIG,
+                "disconnectMessageSuffix",
+                new Class<?>[0]
+        ).filter(String.class::isInstance).map(String.class::cast).orElse("");
+    }
+
+    @Unique
+    private static String flightkickbypass$getTeleportMessage() {
+        return flightkickbypass$invokeStatic(
+                flightkickbypass$CONFIG,
+                "teleportMessage",
+                new Class<?>[0]
+        ).filter(String.class::isInstance).map(String.class::cast).orElse("");
     }
 
     @Unique

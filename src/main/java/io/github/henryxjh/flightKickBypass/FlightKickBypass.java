@@ -34,10 +34,12 @@ public class FlightKickBypass {
 
     private static void logConfigState(String phase) {
         LOGGER.info(
-            "Flight Kick Bypass config {}: kickAfterTeleport={}, expandedSearchRadius={}",
+            "Flight Kick Bypass config {}: kickAfterTeleport={}, expandedSearchRadius={}, disconnectMessageSuffix='{}', teleportMessage='{}'",
             phase,
             Config.kickAfterTeleport(),
-            Config.expandedSearchRadius()
+            Config.expandedSearchRadius(),
+            Config.disconnectMessageSuffix(),
+            Config.teleportMessage()
         );
     }
 }
