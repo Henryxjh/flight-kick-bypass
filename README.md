@@ -6,6 +6,12 @@ Flight Kick Bypass is a server-side NeoForge mod for Minecraft 1.21.1.
 
 When a player is about to be disconnected by the vanilla server for floating or flying too long, the mod first teleports the player to the top of the first solid collision block below their current position. After that, it either continues the vanilla kick flow or keeps the player online, depending on the server config.
 
+## Why
+
+Some modded blocks can have models or collision behavior that leave players in positions where the server repeatedly triggers the vanilla flying check. Network issues can cause similar repeated disconnects. Once this happens, the player may be kicked again immediately after reconnecting, which often requires an administrator to manually move the player or intervene through server tools.
+
+This mod reduces that recovery work by moving the player to a valid block below them before the flying kick is processed.
+
 ## Features
 
 - Handles the vanilla `multiplayer.disconnect.flying` kick path.
