@@ -44,7 +44,7 @@ jobs:
       - name: Upload release artifact
         uses: actions/upload-artifact@v4
         with:
-          name: authserverdownfix-${{ github.ref_name }}
+          name: flightkickbypass-${{ github.ref_name }}
           path: build/libs/*.jar
           if-no-files-found: error
 
