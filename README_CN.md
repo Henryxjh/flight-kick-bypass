@@ -33,7 +33,7 @@ Flight Kick Bypass 是一个适用于 Minecraft 1.21.1 的服务端 NeoForge mod
 
 ## 配置
 
-本 mod 注册的是服务端配置。在专用服务器上，NeoForge 会把配置文件写入对应世界/服务器配置目录。
+本 mod 注册的是服务端配置。在专用服务器上，NeoForge 会把配置文件写到`config/flightkickbypass-server.toml`。
 
 ```toml
 kickAfterTeleport = true
@@ -73,4 +73,4 @@ build/libs/
 
 本 mod 不会给予玩家飞行权限，也不会修改原版移动检测本身。它只改变原版飞行踢出即将执行前的处理行为。
 
-本 mod 图标由 AI 生成。
+项目图标为 AI 生成的说明性美术图，并非游戏内截图。

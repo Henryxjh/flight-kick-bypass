@@ -33,7 +33,7 @@ This mod reduces that recovery work by moving the player to a valid block below 
 
 ## Configuration
 
-The mod registers a server config. On a dedicated server, NeoForge writes it under the world/server config directory.
+The mod registers a server config. On a dedicated server, NeoForge writes it under the `config` directory and named `flightkickbypass-server.toml`.
 
 ```toml
 kickAfterTeleport = true
@@ -73,4 +73,4 @@ build/libs/
 
 This mod does not grant flight permission and does not change the vanilla movement check itself. It only changes what happens immediately before the vanilla flying disconnect is processed.
 
-The mod icon was generated with AI.
+The project icon is AI-generated illustrative artwork, not an in-game screenshot.
