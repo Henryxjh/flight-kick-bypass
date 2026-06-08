@@ -4,6 +4,7 @@ import com.mojang.logging.LogUtils;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Optional;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.phys.Vec3;
@@ -12,6 +13,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.slf4j.Logger;
 
@@ -23,6 +25,14 @@ public abstract class ServerGamePacketListenerImplMixin {
     private static final String flightkickbypass$CONFIG = "io.github.henryxjh.flightKickBypass.Config";
     @Unique
     private static final String flightkickbypass$FLIGHT_KICK_LANDING = "io.github.henryxjh.flightKickBypass.FlightKickLanding";
+    @Unique
+    private static final Component flightkickbypass$TELEPORTED_TO_SAFE_POSITION = Component.literal(
+            "\nTeleported to the nearest safe position before disconnecting."
+    );
+    @Unique
+    private static final Component flightkickbypass$TELEPORT_REASON = Component.literal(
+            "Flying was detected for too long, so you were teleported to the nearest safe position instead of being disconnected."
+    );
 
     @Shadow
     public ServerPlayer player;
@@ -42,6 +52,9 @@ public abstract class ServerGamePacketListenerImplMixin {
     @Shadow
     private int aboveGroundVehicleTickCount;
 
+    @Unique
+    private boolean flightkickbypass$landedBeforeFlyingKick;
+
     @Inject(
             method = "tick",
             at = @At(
@@ -53,9 +66,12 @@ public abstract class ServerGamePacketListenerImplMixin {
     )
     private void flightkickbypass$landBeforePlayerFlyingKick(CallbackInfo ci) {
         boolean landed = this.flightkickbypass$landPlayer();
+        this.flightkickbypass$landedBeforeFlyingKick = landed;
         if (landed && !flightkickbypass$isKickAfterTeleportEnabled()) {
             this.clientIsFloating = false;
             this.aboveGroundTickCount = 0;
+            this.flightkickbypass$notifyPlayerAboutLanding();
+            this.flightkickbypass$landedBeforeFlyingKick = false;
             ci.cancel();
         }
     }
@@ -71,11 +87,53 @@ public abstract class ServerGamePacketListenerImplMixin {
     )
     private void flightkickbypass$landBeforeVehicleFlyingKick(CallbackInfo ci) {
         boolean landed = this.flightkickbypass$landPlayer();
+        this.flightkickbypass$landedBeforeFlyingKick = landed;
         if (landed && !flightkickbypass$isKickAfterTeleportEnabled()) {
             this.clientVehicleIsFloating = false;
             this.aboveGroundVehicleTickCount = 0;
+            this.flightkickbypass$notifyPlayerAboutLanding();
+            this.flightkickbypass$landedBeforeFlyingKick = false;
             ci.cancel();
         }
+    }
+
+    @ModifyArg(
+            method = "tick",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;disconnect(Lnet/minecraft/network/chat/Component;)V",
+                    ordinal = 0
+            )
+    )
+    private Component flightkickbypass$appendLandingMessageToPlayerFlyingKick(Component reason) {
+        return this.flightkickbypass$appendLandingMessage(reason);
+    }
+
+    @ModifyArg(
+            method = "tick",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;disconnect(Lnet/minecraft/network/chat/Component;)V",
+                    ordinal = 1
+            )
+    )
+    private Component flightkickbypass$appendLandingMessageToVehicleFlyingKick(Component reason) {
+        return this.flightkickbypass$appendLandingMessage(reason);
+    }
+
+    @Unique
+    private Component flightkickbypass$appendLandingMessage(Component reason) {
+        if (!this.flightkickbypass$landedBeforeFlyingKick) {
+            return reason;
+        }
+
+        this.flightkickbypass$landedBeforeFlyingKick = false;
+        return reason.copy().append(flightkickbypass$TELEPORTED_TO_SAFE_POSITION);
+    }
+
+    @Unique
+    private void flightkickbypass$notifyPlayerAboutLanding() {
+        this.player.sendSystemMessage(flightkickbypass$TELEPORT_REASON);
     }
 
     @Unique
