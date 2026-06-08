@@ -2,6 +2,8 @@
 
 # Flight Kick Bypass
 
+![Flight Kick Bypass 图标](https://github.com/Henryxjh/flight-kick-bypass/blob/1.21.1-neoforge/src/main/resources/flightkickbypass.png?raw=true)
+
 Flight Kick Bypass 是一个适用于 Minecraft 1.21.1 的服务端 NeoForge mod。
 
 当玩家即将因为原版服务器的“长时间悬空/飞行”检测而被踢出时，本 mod 会先把玩家传送到当前位置 X/Z 下方第一个具有碰撞体的方块顶部。传送完成后，可以根据服务端配置选择继续执行原版踢出流程，或保留玩家在线。
@@ -70,3 +72,5 @@ build/libs/
 ## 说明
 
 本 mod 不会给予玩家飞行权限，也不会修改原版移动检测本身。它只改变原版飞行踢出即将执行前的处理行为。
+
+本 mod 图标由 AI 生成。
