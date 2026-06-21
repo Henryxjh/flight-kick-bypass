@@ -33,5 +33,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: flightkickbypass-build
-          path: build/libs/*.jar
+          path: build/libs/flightkickbypass-*-fabric-neoforge-*.jar
           if-no-files-found: error

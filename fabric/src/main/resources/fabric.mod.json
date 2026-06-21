@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "flightkickbypass",
+  "version": "${version}",
+  "name": "Flight Kick Bypass",
+  "description": "Teleports players to a safe position before the vanilla flying disconnect is processed.",
+  "authors": [
+    "henryxjh"
+  ],
+  "contact": {
+    "homepage": "https://github.com/Henryxjh/flight-kick-bypass",
+    "sources": "https://github.com/Henryxjh/flight-kick-bypass",
+    "issues": "https://github.com/Henryxjh/flight-kick-bypass/issues"
+  },
+  "license": "GPL-3.0",
+  "icon": "flightkickbypass.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "io.github.henryxjh.flightKickBypass.fabric.FlightKickBypass"
+    ]
+  },
+  "mixins": [
+    "flightkickbypass.fabric.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${fabric_loader_version}",
+    "minecraft": "=${minecraft_version}",
+    "java": ">=21"
+  }
+}

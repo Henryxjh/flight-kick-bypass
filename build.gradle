@@ -28,10 +28,13 @@ sourceSets.main.resources {
 
 repositories {
     // Add here additional repositories if required by some of the dependencies below.
+    maven {
+        url = uri('https://maven.fabricmc.net/')
+    }
 }
 
 base {
-    archivesName = "${mod_id}-${minecraft_version}-neoforge"
+    archivesName = "${mod_id}-${minecraft_version}-fabric-neoforge"
 }
 
 // Mojang ships Java 21 to end users in 1.21.1, so mods should target Java 21.
@@ -184,6 +187,35 @@ publishing {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
+}
+
+def neoForgeJar = tasks.named('jar', Jar)
+neoForgeJar.configure {
+    destinationDirectory = layout.buildDirectory.dir('intermediates/neoforge')
+    from('LICENSE') {
+        into 'META-INF'
+    }
+}
+
+def universalJar = tasks.register('universalJar', Jar) {
+    dependsOn neoForgeJar
+    dependsOn project(':fabric').tasks.named('remapJar')
+
+    archiveBaseName = "${mod_id}-${minecraft_version}-fabric-neoforge"
+    archiveVersion = mod_version
+    destinationDirectory = layout.buildDirectory.dir('libs')
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    from({ zipTree(neoForgeJar.get().archiveFile.get().asFile) })
+    from({ zipTree(project(':fabric').tasks.named('remapJar').get().archiveFile.get().asFile) }) {
+        exclude 'META-INF/MANIFEST.MF'
+        exclude 'META-INF/LICENSE'
+        exclude 'flightkickbypass.png'
+    }
+}
+
+tasks.named('assemble').configure {
+    dependsOn universalJar
 }
 
 // IDEA no longer automatically downloads sources/javadoc jars for dependencies, so we need to explicitly enable the behavior.

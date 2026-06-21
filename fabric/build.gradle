@@ -1,0 +1,72 @@
+plugins {
+    id 'fabric-loom' version '1.15.5'
+}
+
+def modVersion = rootProject.mod_version.toString()
+def minecraftVersion = rootProject.minecraft_version.toString()
+def fabricLoaderVersion = rootProject.fabric_loader_version.toString()
+def rootIcon = rootProject.file('src/main/resources/flightkickbypass.png')
+def rootLicense = rootProject.file('LICENSE')
+
+version = modVersion
+group = rootProject.mod_group_id
+
+base {
+    archivesName = "${rootProject.mod_id}-${rootProject.minecraft_version}-fabric-internal"
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${minecraftVersion}"
+    mappings loom.officialMojangMappings()
+    modImplementation "net.fabricmc:fabric-loader:${fabricLoaderVersion}"
+}
+
+def generatedCommonSources = layout.buildDirectory.dir('generated/sources/common')
+def generateFabricCommonSources = tasks.register('generateFabricCommonSources', Sync) {
+    from(rootProject.file('src/main/java')) {
+        exclude 'io/github/henryxjh/flightKickBypass/Config.java'
+        exclude 'io/github/henryxjh/flightKickBypass/FlightKickBypass.java'
+        filter { String line ->
+            line.replace(
+                'io.github.henryxjh.flightKickBypass',
+                'io.github.henryxjh.flightKickBypass.fabric'
+            )
+        }
+    }
+    into generatedCommonSources
+}
+
+sourceSets.main.java.srcDir(generatedCommonSources)
+
+tasks.named('compileJava').configure {
+    dependsOn generateFabricCommonSources
+    options.encoding = 'UTF-8'
+}
+
+tasks.named('processResources').configure {
+    inputs.property 'version', modVersion
+    inputs.property 'minecraft_version', minecraftVersion
+    inputs.property 'fabric_loader_version', fabricLoaderVersion
+
+    filesMatching('fabric.mod.json') {
+        expand(
+            version: modVersion,
+            minecraft_version: minecraftVersion,
+            fabric_loader_version: fabricLoaderVersion
+        )
+    }
+
+    from(rootIcon)
+}
+
+tasks.named('jar').configure {
+    from(rootLicense) {
+        into 'META-INF'
+    }
+}

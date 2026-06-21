@@ -4,7 +4,7 @@
 
 ![Flight Kick Bypass 图标](https://github.com/Henryxjh/flight-kick-bypass/blob/1.21.1-neoforge/src/main/resources/flightkickbypass.png?raw=true)
 
-Flight Kick Bypass 是一个适用于 Minecraft 1.21.1 的服务端 NeoForge mod。
+Flight Kick Bypass 是一个适用于 Minecraft 1.21.1 的服务端 Fabric 和 NeoForge mod。同一个通用 jar 同时支持两个加载器。
 
 当玩家即将因为原版服务器的“长时间悬空/飞行”检测而被踢出时，本 mod 会先把玩家传送到当前位置 X/Z 下方第一个具有碰撞体的方块顶部。传送完成后，可以根据服务端配置选择继续执行原版踢出流程，或保留玩家在线。
 
@@ -23,23 +23,38 @@ Flight Kick Bypass 是一个适用于 Minecraft 1.21.1 的服务端 NeoForge mod
 - 可配置传送成功后是否继续踢出玩家。
 - 如果玩家正下方找不到落点，可配置扩大为正方形半径范围搜索。
 - 配置加载和重载时会在日志中输出当前配置状态。
+- 在一个 jar 中同时提供 Fabric 和 NeoForge 支持，落点与 mixin 实现仍然只维护一份源码。
 
 ## 需求
 
 - Minecraft：`1.21.1`
-- 加载器：NeoForge
+- 加载器：Fabric Loader 或 NeoForge
 - Java：`21`
-- 仅服务端需要安装
+- 仅包含服务端逻辑，连接专用服务器的客户端不需要安装
+- Fabric 不需要安装 Fabric API
 
 ## 配置
 
-本 mod 注册的是服务端配置。在专用服务器上，NeoForge 会把配置文件写到`config/flightkickbypass-server.toml`。
+两个加载器使用相同的配置键和默认值。
+
+NeoForge 会把服务端配置写到 `<world>/serverconfig/flightkickbypass-server.toml`：
 
 ```toml
 kickAfterTeleport = true
 expandedSearchRadius = 0
 disconnectMessageSuffix = "Teleported to the nearest safe position before disconnecting."
 teleportMessage = "Flying was detected for too long, so you were teleported to the nearest safe position instead of being disconnected."
+```
+
+Fabric 会写入 `config/flightkickbypass.json`：
+
+```json
+{
+  "kickAfterTeleport": true,
+  "expandedSearchRadius": 0,
+  "disconnectMessageSuffix": "Teleported to the nearest safe position before disconnecting.",
+  "teleportMessage": "Flying was detected for too long, so you were teleported to the nearest safe position instead of being disconnected."
+}
 ```
 
 `kickAfterTeleport` 选项说明：
@@ -59,10 +74,10 @@ teleportMessage = "Flying was detected for too long, so you were teleported to t
 
 ## 安装
 
-1. 在服务器上安装 Minecraft 1.21.1 对应的 NeoForge。
-2. 将 mod jar 放入服务器的 `mods` 目录。
+1. 在服务器上安装 Minecraft 1.21.1 对应的 Fabric Loader 或 NeoForge。
+2. 将同一个通用 mod jar 放入服务器的 `mods` 目录。
 3. 启动一次服务器以生成配置文件。
-4. 按需修改生成的配置，然后重启服务器或重载配置。
+4. 按需修改生成的配置。Fabric 修改后需要重启；NeoForge 也可以通过其支持的服务端配置重载机制应用。
 
 ## 构建
 
@@ -73,11 +88,13 @@ teleportMessage = "Flying was detected for too long, so you were teleported to t
 构建产物会输出到：
 
 ```text
-build/libs/
+build/libs/flightkickbypass-1.21.1-fabric-neoforge-<version>.jar
 ```
 
 ## 说明
 
 本 mod 不会给予玩家飞行权限，也不会修改原版移动检测本身。它只改变原版飞行踢出即将执行前的处理行为。
+
+专用服务器只需在服务端安装。要在单人游戏的内部服务器中使用，需要把同一个 jar 安装到对应客户端实例。
 
 项目图标为 AI 生成的说明性美术图，并非游戏内截图。
